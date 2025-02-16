@@ -6,6 +6,7 @@ import { Astal } from 'astal/gtk3';
 import { NotificationCard } from './Notification.js';
 import AstalNotifd from 'gi://AstalNotifd?version=0.1';
 import AstalHyprland from 'gi://AstalHyprland?version=0.1';
+import { HyprIDtoGdkID } from 'src/lib/monitors';
 
 const hyprlandService = AstalHyprland.get_default();
 const { position, monitor, active_monitor, showActionsOnHover, displayedTotal } = options.notifications;
@@ -25,9 +26,9 @@ export default (): JSX.Element => {
         [bind(hyprlandService, 'focusedMonitor'), bind(monitor), bind(active_monitor)],
         (focusedMonitor, monitor, activeMonitor) => {
             if (activeMonitor === true) {
-                return focusedMonitor.id;
+                return HyprIDtoGdkID(focusedMonitor.id);
             }
-            return monitor;
+            return HyprIDtoGdkID(monitor);
         },
     );
 

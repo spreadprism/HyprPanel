@@ -3,6 +3,7 @@ import AstalNotifd from 'gi://AstalNotifd?version=0.1';
 import options from 'src/options';
 import { isNotificationIgnored } from 'src/lib/shared/notifications';
 import AstalHyprland from 'gi://AstalHyprland?version=0.1';
+import { HyprIDtoGdkID } from 'src/lib/monitors';
 
 const notifdService = AstalNotifd.get_default();
 const hyprlandService = AstalHyprland.get_default();
@@ -31,7 +32,7 @@ export const notifHasImg = (notification: AstalNotifd.Notification): boolean => 
  */
 export const trackActiveMonitor = (curMonitor: Variable<number>): void => {
     Variable.derive([bind(hyprlandService, 'focusedMonitor')], (monitor) => {
-        curMonitor.set(monitor.id);
+        curMonitor.set(HyprIDtoGdkID(monitor.id));
     });
 };
 

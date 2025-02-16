@@ -4,6 +4,7 @@ import AstalHyprland from 'gi://AstalHyprland?version=0.1';
 import AstalWp from 'gi://AstalWp?version=0.1';
 import options from 'src/options';
 import Brightness from 'src/services/Brightness';
+import { HyprIDtoGdkID } from 'src/lib/monitors';
 
 const wireplumber = AstalWp.get_default() as AstalWp.Wp;
 const audioService = wireplumber.audio;
@@ -63,10 +64,10 @@ export const getOsdMonitor = (): Variable<number> => {
         [bind(hyprlandService, 'focusedMonitor'), bind(monitor), bind(active_monitor)],
         (currentMonitor, defaultMonitor, followMonitor) => {
             if (followMonitor === true) {
-                return currentMonitor.id;
+                return HyprIDtoGdkID(currentMonitor.id);
             }
 
-            return defaultMonitor;
+            return HyprIDtoGdkID(defaultMonitor);
         },
     );
 };

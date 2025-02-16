@@ -33,7 +33,8 @@ import { App, Gtk } from 'astal/gtk3';
 
 import Astal from 'gi://Astal?version=3.0';
 import { bind, Variable } from 'astal';
-import { gdkMonitorIdToHyprlandId, getLayoutForMonitor, isLayoutEmpty } from './utils/monitors';
+import { getLayoutForMonitor, isLayoutEmpty } from './utils/monitors';
+import { GdkIDToHyprID } from '../../lib/monitors';
 
 const { layouts } = options.bar;
 const { location } = options.theme.bar;
@@ -67,10 +68,8 @@ const widget = {
 };
 
 export const Bar = (() => {
-    const usedHyprlandMonitors = new Set<number>();
-
     return (monitor: number): JSX.Element => {
-        const hyprlandMonitor = gdkMonitorIdToHyprlandId(monitor, usedHyprlandMonitors);
+        const hyprlandMonitor = GdkIDToHyprID(monitor);
 
         const computeVisibility = bind(layouts).as(() => {
             const foundLayout = getLayoutForMonitor(hyprlandMonitor, layouts.get());
