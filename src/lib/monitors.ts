@@ -39,30 +39,54 @@ const monitorEquals = (hypr: HyprMonitor, gdk: GdkMonitor): boolean => {
     return hypr.width === gdk.width && hypr.height === gdk.height && hypr.x === gdk.posX && hypr.y === gdk.posY;
 };
 
-export const GdkIDToHyprID = (ID: number): number => {
-    const gdk = getGdkMonitors()[ID];
-    const hyprMonitors = getHyprMonitors();
+type IdToId = {
+    [ID: number]: number;
+};
 
-    for (const hyprID in hyprMonitors) {
-        const hypr = hyprMonitors[hyprID];
-        if (monitorEquals(hypr, gdk)) {
-            return hypr.id;
+let GdkToHyprMap: IdToId = {};
+let HyprToGdkMap: IdToId = {};
+
+export const InvalidateIDCache = (): void => {
+    GdkToHyprMap = {};
+    HyprToGdkMap = {};
+};
+
+export const GdkIDToHyprID = (ID: number): number => {
+    let res = GdkToHyprMap[ID];
+    if (res == null) {
+        const gdk = getGdkMonitors()[ID];
+        const hyprMonitors = getHyprMonitors();
+
+        for (const hyprID in hyprMonitors) {
+            const hypr = hyprMonitors[hyprID];
+            if (monitorEquals(hypr, gdk)) {
+                res = hypr.id;
+                GdkToHyprMap[ID] = res;
+                HyprToGdkMap[res] = ID;
+                break;
+            }
         }
     }
-    return -1;
+    return res;
 };
 
 export const HyprIDtoGdkID = (ID: number): number => {
-    const hypr = getHyprMonitors()[ID];
-    const gdkMonitors = getGdkMonitors();
+    let res = HyprToGdkMap[ID];
+    if (res === null) {
+        const hypr = getHyprMonitors()[ID];
+        const gdkMonitors = getGdkMonitors();
 
-    for (const gdkID in gdkMonitors) {
-        const gdk = gdkMonitors[gdkID];
-        if (monitorEquals(hypr, gdk)) {
-            return parseInt(gdkID);
+        for (const gdkID in gdkMonitors) {
+            const gdk = gdkMonitors[gdkID];
+            if (monitorEquals(hypr, gdk)) {
+                res = parseInt(gdkID);
+                HyprToGdkMap[ID] = res;
+                GdkToHyprMap[res] = ID;
+                break;
+            }
         }
     }
-    return -1;
+    return res;
 };
 
 export function getHyprMonitors(): HyprMonitors {
